@@ -24,7 +24,7 @@
     "normalizer",
     "rollup"
   ],
-  "author": "",
+  "author": "Eugene Oglov <eugeniouglov@example.com>",
   "license": "MIT",
   "dependencies": {
     "@eugeniouglov/string-manipulator": "^1.0.0"
