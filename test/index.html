@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tags-normalizer — HTML Test</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #222; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; overflow-x: auto; border: 1px solid #ddd; }
+    .result { margin-top: 0.5rem; padding: 0.75rem; background: #e8f5e9; border-radius: 6px; border: 1px solid #81c784; }
+    .result.error { background: #ffebee; border-color: #e57373; color: #c62828; }
+    code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.9em; }
+    .tag { display: inline-block; background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 12px; margin: 2px 4px 2px 0; font-size: 0.85em; }
+    .section { margin-bottom: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>tags-normalizer — HTML Test</h1>
+  <p>Tests the <code>dist/tags-normalizer.mjs</code> ES Module bundle directly in the browser.</p>
+
+  <div class="section">
+    <h2>1. Basic normalization</h2>
+    <pre id="out1"></pre>
+    <div id="res1" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>2. CamelCase splitting</h2>
+    <pre id="out2"></pre>
+    <div id="res2" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>3. Special characters removed</h2>
+    <pre id="out3"></pre>
+    <div id="res3" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>4. String input with newlines & commas</h2>
+    <pre id="out4"></pre>
+    <div id="res4" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>5. Duplicate removal</h2>
+    <pre id="out5"></pre>
+    <div id="res5" class="result"></div>
+  </div>
+
+  <script type="module">
+    import TagsNormalizer from '../dist/tags-normalizer.mjs';
+
+    const tn = new TagsNormalizer();
+
+    function render(id, input, output) {
+      const pre = document.getElementById(id);
+      const res = document.getElementById(id.replace('out', 'res'));
+      pre.textContent = `getHandledTags(${JSON.stringify(input)})\n→ ${JSON.stringify(output)}`;
+      res.textContent = JSON.stringify(output);
+      res.className = 'result';
+    }
+
+    try {
+      // Test 1
+      const r1 = tn.getHandledTags(['javascript,js', 'TypeScript']);
+      render('out1', ['javascript,js', 'TypeScript'], r1);
+
+      // Test 2
+      const r2 = tn.getHandledTags(['camelCaseTag', 'PascalCaseWord']);
+      render('out2', ['camelCaseTag', 'PascalCaseWord'], r2);
+
+      // Test 3
+      const r3 = tn.getHandledTags(['hello@world!', 'foo#bar$']);
+      render('out3', ['hello@world!', 'foo#bar$'], r3);
+
+      // Test 4
+      const r4 = tn.getHandledTags('tag1, tag2\ntag3,tag4');
+      render('out4', "'tag1, tag2\\ntag3,tag4'", r4);
+
+      // Test 5
+      const r5 = tn.getHandledTags(['duplicate', 'duplicate', 'unique']);
+      render('out5', ['duplicate', 'duplicate', 'unique'], r5);
+
+      console.log('All tests passed');
+    } catch (err) {
+      document.querySelectorAll('.result').forEach(el => {
+        el.className = 'result error';
+        el.textContent = 'Error: ' + err.message;
+      });
+      console.error(err);
+    }
+  </script>
+</body>
+</html>

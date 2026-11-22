@@ -1,0 +1,39 @@
+{
+  "name": "tags-normalizer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Normalizes and expands user-provided tags (CommonJS + ESM bundles via Rollup)",
+  "main": "dist/tags-normalizer.cjs",
+  "module": "dist/tags-normalizer.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/tags-normalizer.mjs",
+      "require": "./dist/tags-normalizer.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "watch": "rollup -c -w"
+  },
+  "keywords": [
+    "tags",
+    "normalizer",
+    "rollup"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@eugeniouglov/string-manipulator": "^1.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.3.0",
+    "rollup": "^4.24.0",
+    "rollup-plugin-polyfill-node": "^0.13.0"
+  }
+}
