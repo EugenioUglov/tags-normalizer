@@ -23,6 +23,8 @@ npm run dev       # watch — rebuilds on every change to src/index.js
 
 ## Usage
 
+Words are split not only at whitespace, commas and special characters, but also at transitions between letters and digits — e.g. `php7` becomes `php` and `7`, `item123abc` becomes `item`, `123` and `abc`. Standalone numbers (e.g. `123`) stay intact.
+
 ### 1. CommonJS / `require` (Node, older bundlers)
 
 ```js

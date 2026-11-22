@@ -42,7 +42,15 @@ class TagsNormalizer {
     for (const part of parts) {
       const trimmed = part.trim();
       if (trimmed) {
-        tagsArray.push(...sm.splitText(trimmed));
+        // Keep the original tag as it was provided on input.
+        tagsArray.push(trimmed);
+        // Also split at transitions between letters and digits,
+        // e.g. "php7" → ["php", "7"], "item123abc" → ["item", "123", "abc"].
+        for (const word of this.#splitTextIntoWords(trimmed)) {
+          if (word !== trimmed) {
+            tagsArray.push(word);
+          }
+        }
       }
     }
 
@@ -51,6 +59,27 @@ class TagsNormalizer {
 
     // Convertation from Set to Array.
     return Array.from(tagsSet);
+  }
+
+  /**
+   * Splits text into words by whitespace and also at transitions between
+   * letters and digits, so "php7" becomes ["php", "7"] and "123abc" becomes
+   * ["123", "abc"]. Standalone numbers stay intact.
+   */
+  #splitTextIntoWords(text) {
+    const words = [];
+    for (const chunk of String(text).split(/\s+/)) {
+      if (!chunk) {
+        continue;
+      }
+      const parts = chunk.split(/(?<=[\p{L}])(?=[\p{N}])|(?<=[\p{N}])(?=[\p{L}])/gu);
+      for (const part of parts) {
+        if (part) {
+          words.push(part);
+        }
+      }
+    }
+    return words;
   }
 
   #getAdditionalTags(tags) {
@@ -66,8 +95,12 @@ class TagsNormalizer {
 
       const tagWithoutSpecialCharacters = sm.getTextWithoutSpecialCharactes(tag, ' ').trim();
 
-      if (tag !== tagWithoutSpecialCharacters) {
-        additionalTag = tagWithoutSpecialCharacters;
+      // Split also at transitions between letters and digits,
+      // e.g. "php7" → "php 7", "v2 0" → "v 2 0".
+      const tagSplitByNumbers = this.#splitTextIntoWords(tagWithoutSpecialCharacters).join(' ');
+
+      if (tag !== tagSplitByNumbers) {
+        additionalTag = tagSplitByNumbers;
       }
 
       if (
@@ -75,7 +108,7 @@ class TagsNormalizer {
         tagWithoutSpecialCharacters !== tagWithoutSpecialCharacters.toLowerCase()
       ) {
         const tagWithSeparatedWords = sm.getSeparatedWordsByCamelCaseString(tagWithoutSpecialCharacters);
-        additionalTag = tagWithSeparatedWords;
+        additionalTag = this.#splitTextIntoWords(tagWithSeparatedWords).join(' ');
       }
 
       if (additionalTag) {
